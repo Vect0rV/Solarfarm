@@ -23,6 +23,7 @@ public class PanelFileRepository {
     public List<Panel> findAll() throws DataAccessException {
         ArrayList<Panel> result = new ArrayList<>();
         try(BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            reader.readLine();
            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                Panel p = lineToPanel(line);
                 result.add(p);
@@ -33,6 +34,17 @@ public class PanelFileRepository {
             throw new DataAccessException("could not open the file path: " + filePath, e);
         }
         return result;
+    }
+
+    public List<Panel> findBySection(String section) throws DataAccessException {
+        ArrayList<Panel> panels = new ArrayList<>();
+        for(Panel p : findAll()) {
+            if(p.getSection().equals(section)) {
+                 panels.add(p);
+            }
+        }
+
+        return panels;
     }
 
     private Panel lineToPanel(String line) {
@@ -47,9 +59,9 @@ public class PanelFileRepository {
                 fields[1],
                 Integer.parseInt(fields[2]),
                 Integer.parseInt(fields[3]),
-                MaterialType.valueOf(fields[6]),
-                fields[4],
-                "true".equals(fields[7]));
+                MaterialType.valueOf(fields[4]),
+                fields[5],
+                "true".equals(fields[6]));
 
     }
 }

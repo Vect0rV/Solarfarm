@@ -1,0 +1,4 @@
+panelId,section,row,column,materialType,instillationYear,isTracking
+1,Ridge,5,2,MULTI_SI,2015,false
+2,Main Road,1,3,MONO_SI,2011,false
+3,Hill,1,1,ASI,2022,true
