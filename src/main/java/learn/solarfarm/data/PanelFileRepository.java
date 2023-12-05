@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PanelFileRepository {
+public class PanelFileRepository implements PanelRepository {
 
     private final String filePath;
 
@@ -20,6 +20,7 @@ public class PanelFileRepository {
         this.filePath = filePath;
     }
 
+    @Override
     public List<Panel> findAll() throws DataAccessException {
         ArrayList<Panel> result = new ArrayList<>();
         try(BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -36,6 +37,7 @@ public class PanelFileRepository {
         return result;
     }
 
+    @Override
     public List<Panel> findBySection(String section) throws DataAccessException {
         ArrayList<Panel> panels = new ArrayList<>();
         for(Panel p : findAll()) {
