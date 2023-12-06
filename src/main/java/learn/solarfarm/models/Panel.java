@@ -71,7 +71,7 @@ public class Panel {
         this.installationYear = installationYear;
     }
 
-    public boolean isTracking() {
+    public boolean getIsTracking() {
         return isTracking;
     }
 

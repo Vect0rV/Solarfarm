@@ -10,7 +10,7 @@ public class PanelService {
 
     private final PanelRepository repository;
 
-    PanelService(PanelRepository repository){
+    public PanelService(PanelRepository repository){
         this.repository = repository;
     }
 
