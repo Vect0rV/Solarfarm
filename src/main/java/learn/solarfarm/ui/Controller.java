@@ -1,6 +1,7 @@
 package learn.solarfarm.ui;
 
 import learn.solarfarm.data.DataAccessException;
+import learn.solarfarm.domain.PanelResult;
 import learn.solarfarm.domain.PanelService;
 import learn.solarfarm.models.Panel;
 
@@ -37,15 +38,55 @@ public class Controller {
                 case FIND_PANEL_BY_SECTION:
                     displayPanels();
                     break;
+                case ADD:
+                    Add();
+                    break;
+                case UPDATE:
+                    Update();
+                    break;
             }
         } while(option != MenuOption.EXIT);
     }
 
-    private void displayPanels() throws DataAccessException {
+    private String displayPanels() throws DataAccessException {
         view.displayHeader(MenuOption.FIND_PANEL_BY_SECTION.getTitle());
         String section = view.readSection();
         List<Panel> panels = service.findBySection(section);
-        view.displayPanels(panels);
+        view.displayPanels(panels, section);
+
+        return section;
+    }
+    private void Add() throws DataAccessException {
+        Panel panel = view.createPanel();
+        PanelResult result = service.add(panel);
+        view.displayResult(result, panel, false);
+    }
+
+    private void Update() throws DataAccessException {
+        String section = null;
+        Panel panel = null;
+        do {
+            section = displayPanels();
+            panel = view.choosePanel(getPanels(section));
+        }while(getPanels(section).size() == 0);
+
+        view.editPanel(panel);
+        if(panel == null) {
+            view.displayMessage("Panel not found");
+            return;
+        }
+
+        PanelResult result = service.update(panel);
+
+        if(result.isSuccess()) {
+            view.displayResult(result, panel, true);
+        } else {
+            view.displayErrors(result.getErrorMessages());
+        }
+    }
+
+    private List<Panel> getPanels(String section) throws DataAccessException {
+        return service.findBySection(section);
     }
 
 }

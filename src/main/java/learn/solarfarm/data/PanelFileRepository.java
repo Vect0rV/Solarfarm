@@ -3,10 +3,8 @@ package learn.solarfarm.data;
 import learn.solarfarm.models.MaterialType;
 import learn.solarfarm.models.Panel;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +13,8 @@ public class PanelFileRepository implements PanelRepository {
     private final String filePath;
 
     private final String delimiter = ",";
+
+    private static final String HEADER = "panelId,section,row,column,materialType,instillationYear,isTracking";
 
     public PanelFileRepository(String filePath) {
         this.filePath = filePath;
@@ -49,6 +49,60 @@ public class PanelFileRepository implements PanelRepository {
         return panels;
     }
 
+    public Panel add(Panel panel) throws DataAccessException {
+        List<Panel> allPanels = findAll();
+        int nextId = getNextId(allPanels);
+        panel.setPanelId(nextId);
+        allPanels.add(panel);
+        writeToFile(allPanels);
+
+        return panel;
+    }
+
+    public Boolean update(Panel panel) throws DataAccessException {
+        List<Panel> allPanels = findAll();
+        for(int i = 0; i < allPanels.size(); i++) {
+            if(panel.getPanelId() == allPanels.get(i).getPanelId()) {
+                allPanels.set(i, panel);
+                writeToFile(allPanels);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void writeToFile(List<Panel> allPanels) {
+        try(PrintWriter writer = new PrintWriter(filePath)) {
+            writer.println("panelId,section,row,column,materialType,instillationYear,isTracking");
+            for(Panel panel : allPanels) {
+                writer.println(panelToLine(panel));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String panelToLine(Panel panel) {
+        StringBuilder buffer = new StringBuilder(100);
+        buffer.append(panel.getPanelId()).append(delimiter);
+        buffer.append(cleanField(panel.getSection())).append(delimiter);
+        buffer.append(panel.getRow()).append(delimiter);
+        buffer.append(panel.getColumn()).append(delimiter);
+        buffer.append(cleanField(panel.getMaterialType().toString())).append(delimiter);
+        buffer.append(panel.getInstallationYear()).append(delimiter);
+        buffer.append(panel.getIsTracking());
+
+        return buffer.toString();
+
+    }
+
+    private String cleanField(String field) {
+        return field.replace(delimiter, "")
+                .replace("/n", "")
+                .replace("/r", "");
+    }
+
+
     private Panel lineToPanel(String line) {
         String[] fields = line.split(",");
 
@@ -62,8 +116,17 @@ public class PanelFileRepository implements PanelRepository {
                 Integer.parseInt(fields[2]),
                 Integer.parseInt(fields[3]),
                 MaterialType.valueOf(fields[4]),
-                fields[5],
+                Year.parse(fields[5]),
                 "true".equals(fields[6]));
+    }
 
+    private int getNextId(List<Panel> allPanels) {
+        int maxId = 0;
+        for (Panel p : allPanels) {
+            if(maxId < p.getPanelId()) {
+                maxId = p.getPanelId();
+            }
+        }
+        return maxId +1;
     }
 }

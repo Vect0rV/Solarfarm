@@ -1,5 +1,9 @@
 package learn.solarfarm.ui;
 
+import learn.solarfarm.models.MaterialType;
+
+import java.time.Year;
+
 public interface TextIO {
     void println(Object value);
 
@@ -14,4 +18,10 @@ public interface TextIO {
     int readInt(String prompt);
 
     int readInt(String prompt, int min, int max);
+
+    int readInt(String prompt, int min, int max, Boolean isRow);
+
+    public Year readYear(String prompt);
+
+    public MaterialType readType();
 }

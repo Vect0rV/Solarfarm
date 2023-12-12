@@ -28,7 +28,7 @@ public class PanelResult {
         return payload;
     }
 
-    public void setPayload() {
+    public void setPayload(Panel payload) {
         this.payload = payload;
 
     }}

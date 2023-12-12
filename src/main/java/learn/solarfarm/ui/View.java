@@ -1,7 +1,10 @@
 package learn.solarfarm.ui;
 
+import learn.solarfarm.domain.PanelResult;
+import learn.solarfarm.models.MaterialType;
 import learn.solarfarm.models.Panel;
 
+import java.time.Year;
 import java.util.List;
 
 public class View {
@@ -17,7 +20,7 @@ public class View {
             for (int i = 0; i < MenuOption.values().length; i++) {
                 System.out.printf("%s. %s%n", i, values[i].getTitle());
             }
-            int index = io.readInt("Select [0-4]: ", 0, 1);
+            int index = io.readInt("Select [0-4]: ", 0, 3);
             return values[index];
     }
 
@@ -30,25 +33,132 @@ public class View {
 
 
     public String readSection() {
-        String section = io.readString("Enter the name of an existing section: ");
+        String section = io.readString("Section: ");
         return section;
     }
 
-    public void displayPanels(List<Panel> panels) {
+    public void displayMessage(String message) {
+        io.println("");
+        io.println(message);
+    }
+
+
+
+
+    public void displayErrors(List<String> errors) {
+        displayHeader("Errors: ");
+        for (String err : errors) {
+            System.out.println(err);
+        }
+    }
+
+
+    public void displayPanels(List<Panel> panels, String section) {
         displayHeader("Panels: ");
         if(panels.size() == 0) {
             io.println("No panels found.");
         } else {
+            io.printf("Section name: %s%n", section);
+            io.println("");
+
+            io.println("ID Row Col Year Material Tracking");
             for (Panel p : panels) {
-                io.printf("%s - %s, %s, %s, %s, %s, %s%n",
+
+                io.printf(" %s   %s   %s %s  %s    %s%n",
                         p.getPanelId(),
-                        p.getSection(),
                         p.getRow(),
                         p.getColumn(),
-                        p.getMaterialType(),
                         p.getInstallationYear(),
+                        p.getMaterialType(),
                         p.getIsTracking());
             }
         }
+    }
+
+    public Panel choosePanel(List<Panel> panels){
+//        String section = readSection();
+//        displayPanels(panels, section);
+        Panel result = null;
+        if (panels.size() > 0) {
+            int panelId = io.readInt("Choose a panel ID:");
+            for(Panel panel : panels) {
+                if(panelId == panel.getPanelId()) {
+                    result = panel;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    public Panel createPanel() {
+        displayHeader(MenuOption.ADD.getTitle());
+        Panel panel = new Panel();
+        panel.setSection(readSection());
+        panel.setRow(io.readInt("Row: ", 0, 250, true));
+        panel.setColumn(io.readInt("Column: ", 0, 250, false));
+        panel.setInstallationYear(io.readYear("Instillation Year: "));
+        panel.setMaterialType(io.readType());
+        panel.setIsTracking(io.readBoolean("Tracked [y/n]: "));
+        return panel;
+    }
+
+    public void displayResult(PanelResult result, Panel panel, Boolean isUpdated) {
+        if (result.isSuccess()) {
+            if (result.getPayload() != null) {
+                System.out.printf("%n[Success] %nPanel %s-%s-%s %s.%n", panel.getSection(), panel.getRow(), panel.getColumn(), isUpdated ? "updated" : "added");
+            }
+        } else {
+            displayHeader("Errors");
+            for (String msg : result.getErrorMessages()) {
+                System.out.printf("- %s%n", msg);
+            }
+        }
+    }
+
+    public void displayUpdateResult(PanelResult result, Panel panel) {
+        if (result.isSuccess()) {
+            if (result.getPayload() != null) {
+                System.out.printf("%n[Success] %nPanel %s-%s-%s updated.%n", panel.getSection(), panel.getRow(), panel.getColumn());
+            }
+        } else {
+            displayHeader("Errors");
+            for (String msg : result.getErrorMessages()) {
+                System.out.printf("- %s%n", msg);
+            }
+        }
+    }
+
+
+    public Panel editPanel(Panel panel) {
+        displayHeader("Edit a Panel");
+        // Only update if it changed
+
+
+        MaterialType type = readType();
+        if(type.toString().trim().length() > 0) {
+            panel.setMaterialType(type);
+        }
+
+        Year instillationYear = io.readYear("Instillation Year (" + (panel.getInstallationYear() + "): "));
+        if(instillationYear.length() > 0) {
+            panel.setInstallationYear(instillationYear);
+        }
+
+        Boolean isTracking = io.readBoolean("Tracked (" + (panel.getIsTracking() + "): "));
+        if(!isTracking.toString().isBlank()) {
+            panel.setIsTracking(isTracking);
+        }
+        return panel;
+    }
+
+    MaterialType readType() {
+        int index = 1;
+        for (MaterialType type : MaterialType.values()) {
+            System.out.printf("%s. %s%n", index++, type);
+        }
+        index--;
+        String msg = String.format("Select Material Type [1-%s]:", index);
+        return MaterialType.values()[io.readInt(msg, 1, index) - 1];
     }
 }

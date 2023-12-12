@@ -3,7 +3,9 @@ package learn.solarfarm.ui;
 public enum MenuOption {
 
     EXIT("Exit"),
-    FIND_PANEL_BY_SECTION("Find Panel by Section");
+    FIND_PANEL_BY_SECTION("Find Panel by Section"),
+    ADD("Add a Panel"),
+    UPDATE("Update a Panel");
 
     private final String title;
 

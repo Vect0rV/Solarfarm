@@ -1,5 +1,8 @@
 package learn.solarfarm.models;
 
+import java.time.Year;
+import java.util.Objects;
+
 public class Panel {
 
     private int panelId;
@@ -7,10 +10,10 @@ public class Panel {
     private int row;
     private int column;
     private MaterialType materialType;
-    private String installationYear;
+    private Year installationYear;
     private boolean isTracking;
 
-    public Panel(int panelId, String section, int row, int column, MaterialType materialType, String installationYear, boolean isTracking) {
+    public Panel(int panelId, String section, int row, int column, MaterialType materialType, Year installationYear, boolean isTracking) {
         this.panelId = panelId;
         this.section = section;
         this.row = row;
@@ -63,11 +66,11 @@ public class Panel {
         this.materialType = materialType;
     }
 
-    public String getInstallationYear() {
+    public Year getInstallationYear() {
         return installationYear;
     }
 
-    public void setInstallationYear(String installationYear) {
+    public void setInstallationYear(Year installationYear) {
         this.installationYear = installationYear;
     }
 
@@ -75,7 +78,26 @@ public class Panel {
         return isTracking;
     }
 
-    public void setTracking(boolean tracking) {
+    public void setIsTracking(boolean tracking) {
         isTracking = tracking;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Panel panel = (Panel) o;
+        return panelId == panel.panelId
+                && row == panel.row
+                && column == panel.column &&
+                isTracking == panel.isTracking
+                && Objects.equals(section, panel.section)
+                && materialType == panel.materialType
+                && Objects.equals(installationYear, panel.installationYear);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(panelId, section, row, column, materialType, installationYear, isTracking);
     }
 }
