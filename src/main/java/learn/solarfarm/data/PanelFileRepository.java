@@ -2,6 +2,7 @@ package learn.solarfarm.data;
 
 import learn.solarfarm.models.MaterialType;
 import learn.solarfarm.models.Panel;
+import learn.solarfarm.ui.Controller;
 
 import java.io.*;
 import java.time.Year;
@@ -49,6 +50,18 @@ public class PanelFileRepository implements PanelRepository {
         return panels;
     }
 
+    @Override
+    public List<Panel> findBySectionRowColumn(String section, int row, int column) throws DataAccessException {
+        ArrayList<Panel> panels = new ArrayList<>();
+        for(Panel p : findAll()) {
+            if(p.getSection().equals(section) && p.getRow() == row && p.getColumn() == column) {
+                panels.add(p);
+            }
+        }
+
+        return panels;
+    }
+
     public Panel add(Panel panel) throws DataAccessException {
         List<Panel> allPanels = findAll();
         int nextId = getNextId(allPanels);
@@ -68,6 +81,19 @@ public class PanelFileRepository implements PanelRepository {
                 return true;
             }
         }
+        return false;
+    }
+
+    public Boolean delete(int panelId) throws DataAccessException {
+        List<Panel> allPanels = findAll();
+        for(int i = 0; i < allPanels.size(); i++) {
+            if(panelId == allPanels.get(i).getPanelId()) {
+                allPanels.remove(i);
+                writeToFile(allPanels);
+                return true;
+            }
+        }
+
         return false;
     }
 

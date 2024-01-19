@@ -226,4 +226,36 @@ public class PanelServiceTest {
         assertEquals(1, result.getErrorMessages().size());
         assertTrue(result.getErrorMessages().get(0).contains("past"));
     }
+
+    @Test
+    void shouldDeleteId1() throws DataAccessException {
+        Panel panel = new Panel();
+        panel.setPanelId(1);
+        panel.setSection("Section");
+        panel.setRow(25);
+        panel.setColumn(50);
+        panel.setInstallationYear(Year.of(2022));
+        panel.setMaterialType(MaterialType.CD_TE);
+        panel.setIsTracking(false);
+
+        PanelResult result = service.delete(1);
+
+        assertTrue(result.isSuccess());
+    }
+
+    @Test
+    void shouldNotDeleteId100() throws DataAccessException {
+        Panel panel = new Panel();
+        panel.setPanelId(100);
+        panel.setSection("Section");
+        panel.setRow(25);
+        panel.setColumn(50);
+        panel.setInstallationYear(Year.of(2022));
+        panel.setMaterialType(MaterialType.CD_TE);
+        panel.setIsTracking(false);
+
+        PanelResult result = service.delete(100);
+
+        assertFalse(result.isSuccess());
+    }
 }

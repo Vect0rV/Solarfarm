@@ -17,7 +17,7 @@ public class App {
 
         View view = new View(io);
 
-        Controller controller = new Controller(service, view);
+        Controller controller = new Controller(service, view, io);
         controller.run();
     }
 }

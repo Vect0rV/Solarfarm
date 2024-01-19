@@ -109,4 +109,24 @@ class PanelFileRepositoryTest {
         assertFalse(actual);
     }
 
+    @Test
+    void shouldDeleteExistingPanelId() throws DataAccessException {
+        Panel panel = new Panel();
+        panel.setPanelId(1);
+
+        boolean actual = repository.delete(panel.getPanelId());
+
+        assertTrue(actual);
+    }
+
+    @Test
+    void shouldNotDeleteMissingPanelId() throws DataAccessException {
+        Panel panel = new Panel();
+        panel.setPanelId(100);
+
+        boolean actual = repository.delete(panel.getPanelId());
+
+        assertFalse(actual);
+    }
+
 }

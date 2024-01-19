@@ -23,7 +23,11 @@ public class Panel {
         this.isTracking = isTracking;
     }
 
-    public Panel() {};
+    public Panel() {}
+
+    public Panel(int panelId) {
+        this.panelId = panelId;
+    }
 
 
     public int getPanelId() {

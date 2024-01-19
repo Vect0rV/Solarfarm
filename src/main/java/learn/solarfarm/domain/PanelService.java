@@ -46,7 +46,8 @@ public class PanelService {
     }
 
     public PanelResult update(Panel panel) throws DataAccessException {
-        PanelResult result = validate(panel);
+//        PanelResult result = validate(panel);
+        PanelResult result = new PanelResult();
 
         if(panel.getPanelId() <= 0) {
             result.addErrorMessage("Panel ID is required");
@@ -62,6 +63,17 @@ public class PanelService {
             }
         }
 
+        return result;
+    }
+
+    public PanelResult delete(int panelId) throws DataAccessException {
+        PanelResult result = new PanelResult();
+
+
+        if(!repository.delete(panelId)) {
+            String message = String.format("Panel ID %s not found", panelId);
+            result.addErrorMessage(message);
+            }
         return result;
     }
 
@@ -99,7 +111,10 @@ public class PanelService {
         for (Panel p : panels) {
             if (Objects.equals(panel.getSection(), p.getSection())
                     && Objects.equals(panel.getRow(), p.getRow())
-                    && Objects.equals(panel.getColumn(), p.getColumn())) {
+                    && Objects.equals(panel.getColumn(), p.getColumn())
+                    && Objects.equals(panel.getMaterialType(), p.getMaterialType())
+                    && Objects.equals(panel.getInstallationYear(), p.getInstallationYear())
+                    && Objects.equals(panel.getIsTracking(), p.getIsTracking())) {
                 result.addErrorMessage("duplicate panel is not allowed");
                 return result;
             }

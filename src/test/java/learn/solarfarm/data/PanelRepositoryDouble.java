@@ -31,6 +31,11 @@ public class PanelRepositoryDouble implements PanelRepository{
         return results;
     }
 
+    @Override
+    public List<Panel> findBySectionRowColumn(String section, int row, int column) throws DataAccessException {
+        return null;
+    }
+
     public Panel add(Panel panel) throws DataAccessException{
         return null;
     }
@@ -38,5 +43,18 @@ public class PanelRepositoryDouble implements PanelRepository{
     @Override
     public Boolean update(Panel panel) throws DataAccessException {
         return true;
+    }
+
+    @Override
+    public Boolean delete(int panelId) throws DataAccessException {
+        ArrayList<Panel> results = new ArrayList<>();
+        for (Panel p : panels) {
+            if(panelId == p.getPanelId()) {
+                results.remove(p);
+                return true;
+            }
+        }
+
+        return false;
     }
 }

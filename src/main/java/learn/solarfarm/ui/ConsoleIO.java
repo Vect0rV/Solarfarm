@@ -33,8 +33,16 @@ public class ConsoleIO implements TextIO {
 
     @Override
     public Boolean readBoolean(String prompt) {
-        String result = readString(prompt);
-        return result.equalsIgnoreCase("y");
+        String result = null;
+        Boolean isValid = false;
+
+        while (!isValid) {
+            result = readString(prompt);
+            if (result.equals("y") || result.equals("Y") || result.equals("n") || result.equals("N")) {
+                return result.equalsIgnoreCase("y");
+            }
+        }
+        return false;
     }
 
     private String readRequiredString(String prompt) {
@@ -65,7 +73,7 @@ public class ConsoleIO implements TextIO {
         int result = 0;
         boolean isValid = false;
         do{
-            String value = readRequiredString(prompt);
+            String value = readString(prompt);
             try {
                 result = Integer.parseInt(value);
                 isValid = true;
@@ -90,13 +98,39 @@ public class ConsoleIO implements TextIO {
 
     public Year readYear(String prompt) {
 
+        String value = null;
+        Year year = null;
+        boolean isValidYear = false;
+        do {
+            value = readString(prompt);
+            try {
+                if (value.length() == 4) {
+                    isValidYear = true;
+                }if(value.isBlank()){
+                    return null;
+                }
+                else {
+                    System.out.println("`4 digit value is required`");
+                }
+            } catch (DateTimeParseException ex) {
+                printf("The above input caused %s: %n", ex);
+            }
+
+        }while (!isValidYear);
+        year = Year.parse(value);
+
+        return year;
+    }
+
+    public Year readRequiredYear(String prompt) {
+
             String value = null;
             Year year = null;
             boolean isValidYear = false;
             do {
                 value = readString(prompt);
                 try {
-                    if (!value.isBlank() || value.length() > 4) {
+                    if (!value.isBlank() && value.length() == 4) {
                         isValidYear = true;
                     } else {
                         System.out.println("`4 digit value is required`");
@@ -129,7 +163,7 @@ public class ConsoleIO implements TextIO {
             if(value >= min && value <= max) {
                 return value;
             }
-            printf("%s must be between %s and %s.%n", value, min, max);
+            printf("Selection must be between %s and %s.%n", value, min, max);
         }
     }
 }

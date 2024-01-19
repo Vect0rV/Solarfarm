@@ -24,4 +24,6 @@ public interface TextIO {
     public Year readYear(String prompt);
 
     public MaterialType readType();
+
+    public Year readRequiredYear(String prompt);
 }

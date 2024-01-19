@@ -20,7 +20,7 @@ public class View {
             for (int i = 0; i < MenuOption.values().length; i++) {
                 System.out.printf("%s. %s%n", i, values[i].getTitle());
             }
-            int index = io.readInt("Select [0-4]: ", 0, 3);
+            int index = io.readInt("Select [0-4]: ", 0, 4);
             return values[index];
     }
 
@@ -33,7 +33,7 @@ public class View {
 
 
     public String readSection() {
-        String section = io.readString("Section: ");
+        String section = io.readString("Enter the name of a Section: ");
         return section;
     }
 
@@ -64,30 +64,43 @@ public class View {
             io.println("ID Row Col Year Material Tracking");
             for (Panel p : panels) {
 
-                io.printf(" %s   %s   %s %s  %s    %s%n",
+                io.printf("%s  %s   %s   %s %s %s %n",
                         p.getPanelId(),
                         p.getRow(),
                         p.getColumn(),
                         p.getInstallationYear(),
                         p.getMaterialType(),
-                        p.getIsTracking());
+                        p.getIsTracking()
+                );
             }
         }
     }
 
-    public Panel choosePanel(List<Panel> panels){
-//        String section = readSection();
-//        displayPanels(panels, section);
+//    public void displayPanels() {
+//        displayHeader("All Panels: ");
+//        List<panels> panels =
+//        if(panels.size() == 0) {
+//            io.println("No panels found.");
+//        } else {
+//
+//        }
+//    }
+
+    public Panel choosePanel(List<Panel> panels, int panelId){
         Panel result = null;
         if (panels.size() > 0) {
-            int panelId = io.readInt("Choose a panel ID:");
+
             for(Panel panel : panels) {
                 if(panelId == panel.getPanelId()) {
                     result = panel;
                     break;
                 }
             }
+//            if (result == null){
+//                return new Panel(panelId);
+//            }
         }
+
         return result;
     }
 
@@ -97,7 +110,7 @@ public class View {
         panel.setSection(readSection());
         panel.setRow(io.readInt("Row: ", 0, 250, true));
         panel.setColumn(io.readInt("Column: ", 0, 250, false));
-        panel.setInstallationYear(io.readYear("Instillation Year: "));
+        panel.setInstallationYear(io.readRequiredYear("Instillation Year: "));
         panel.setMaterialType(io.readType());
         panel.setIsTracking(io.readBoolean("Tracked [y/n]: "));
         return panel;
@@ -107,19 +120,6 @@ public class View {
         if (result.isSuccess()) {
             if (result.getPayload() != null) {
                 System.out.printf("%n[Success] %nPanel %s-%s-%s %s.%n", panel.getSection(), panel.getRow(), panel.getColumn(), isUpdated ? "updated" : "added");
-            }
-        } else {
-            displayHeader("Errors");
-            for (String msg : result.getErrorMessages()) {
-                System.out.printf("- %s%n", msg);
-            }
-        }
-    }
-
-    public void displayUpdateResult(PanelResult result, Panel panel) {
-        if (result.isSuccess()) {
-            if (result.getPayload() != null) {
-                System.out.printf("%n[Success] %nPanel %s-%s-%s updated.%n", panel.getSection(), panel.getRow(), panel.getColumn());
             }
         } else {
             displayHeader("Errors");
@@ -151,6 +151,8 @@ public class View {
         }
         return panel;
     }
+
+    public
 
     MaterialType readType() {
         int index = 1;
