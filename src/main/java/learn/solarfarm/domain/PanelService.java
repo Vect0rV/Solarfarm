@@ -3,6 +3,7 @@ package learn.solarfarm.domain;
 import learn.solarfarm.data.DataAccessException;
 import learn.solarfarm.data.PanelRepository;
 import learn.solarfarm.models.Panel;
+import org.springframework.stereotype.Service;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -13,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+@Service
 public class PanelService {
 
     private final PanelRepository repository;

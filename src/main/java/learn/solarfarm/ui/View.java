@@ -3,10 +3,12 @@ package learn.solarfarm.ui;
 import learn.solarfarm.domain.PanelResult;
 import learn.solarfarm.models.MaterialType;
 import learn.solarfarm.models.Panel;
+import org.springframework.stereotype.Component;
 
 import java.time.Year;
 import java.util.List;
 
+@Component
 public class View {
 
     private final TextIO io;

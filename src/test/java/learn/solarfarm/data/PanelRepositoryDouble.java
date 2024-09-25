@@ -31,10 +31,10 @@ public class PanelRepositoryDouble implements PanelRepository{
         return results;
     }
 
-    @Override
-    public List<Panel> findBySectionRowColumn(String section, int row, int column) throws DataAccessException {
-        return null;
-    }
+//    @Override
+//    public List<Panel> findBySectionRowColumn(String section, int row, int column) throws DataAccessException {
+//        return null;
+//    }
 
     public Panel add(Panel panel) throws DataAccessException{
         return null;

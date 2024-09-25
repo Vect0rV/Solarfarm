@@ -9,8 +9,6 @@ public interface PanelRepository {
 
     List<Panel> findBySection(String section) throws DataAccessException;
 
-    List<Panel> findBySectionRowColumn(String section, int row, int column) throws DataAccessException;
-
     Panel add(Panel panel) throws DataAccessException;
 
     Boolean update(Panel panel) throws DataAccessException;

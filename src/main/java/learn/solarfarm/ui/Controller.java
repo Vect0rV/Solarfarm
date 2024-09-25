@@ -4,17 +4,22 @@ import learn.solarfarm.data.DataAccessException;
 import learn.solarfarm.domain.PanelResult;
 import learn.solarfarm.domain.PanelService;
 import learn.solarfarm.models.Panel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class Controller {
 
+    @Autowired
     private final PanelService service;
 
     private final View view;
 
     private final TextIO io;
 
+    @Autowired
     public Controller(PanelService service, View view, TextIO io) {
         this.service = service;
         this.view = view;

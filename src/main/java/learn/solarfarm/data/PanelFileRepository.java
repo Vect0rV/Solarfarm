@@ -3,11 +3,14 @@ package learn.solarfarm.data;
 import learn.solarfarm.models.MaterialType;
 import learn.solarfarm.models.Panel;
 import learn.solarfarm.ui.Controller;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class PanelFileRepository implements PanelRepository {
 
@@ -17,7 +20,7 @@ public class PanelFileRepository implements PanelRepository {
 
     private static final String HEADER = "panelId,section,row,column,materialType,instillationYear,isTracking";
 
-    public PanelFileRepository(String filePath) {
+    public PanelFileRepository(@Value("${dataFilePath}") String filePath) {
         this.filePath = filePath;
     }
 
@@ -50,17 +53,17 @@ public class PanelFileRepository implements PanelRepository {
         return panels;
     }
 
-    @Override
-    public List<Panel> findBySectionRowColumn(String section, int row, int column) throws DataAccessException {
-        ArrayList<Panel> panels = new ArrayList<>();
-        for(Panel p : findAll()) {
-            if(p.getSection().equals(section) && p.getRow() == row && p.getColumn() == column) {
-                panels.add(p);
-            }
-        }
-
-        return panels;
-    }
+//    @Override
+//    public List<Panel> findBySectionRowColumn(String section, int row, int column) throws DataAccessException {
+//        ArrayList<Panel> panels = new ArrayList<>();
+//        for(Panel p : findAll()) {
+//            if(p.getSection().equals(section) && p.getRow() == row && p.getColumn() == column) {
+//                panels.add(p);
+//            }
+//        }
+//
+//        return panels;
+//    }
 
     public Panel add(Panel panel) throws DataAccessException {
         List<Panel> allPanels = findAll();
