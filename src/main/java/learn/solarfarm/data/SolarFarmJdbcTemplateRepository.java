@@ -3,6 +3,7 @@ package learn.solarfarm.data;
 import learn.solarfarm.models.MaterialType;
 import learn.solarfarm.models.Panel;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,6 +17,7 @@ import java.time.Year;
 import java.util.List;
 
 @Repository
+@Profile("jdbc-template")
 public class SolarFarmJdbcTemplateRepository implements PanelRepository {
 
     private final JdbcTemplate jdbcTemplate;
@@ -97,7 +99,7 @@ public class SolarFarmJdbcTemplateRepository implements PanelRepository {
                 + "`row` = ?, "
                 + "`column` = ?, "
                 + "material_type = ?, "
-                + "installation_year = ?, "
+                + "installation_year = ? "
                 + "isTracking = ? "
                 + "where panel_id = ?;";
 
@@ -106,7 +108,7 @@ public class SolarFarmJdbcTemplateRepository implements PanelRepository {
                 panel.getRow(),
                 panel.getColumn(),
                 panel.getMaterialType().name(),
-                panel.getInstallationYear(),
+                panel.getInstallationYear().getValue(),
                 panel.getIsTracking(),
                 panel.getPanelId()
         );

@@ -9,17 +9,17 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
+
 public class Controller {
 
-    @Autowired
+
     private final PanelService service;
 
     private final View view;
 
     private final TextIO io;
 
-    @Autowired
+
     public Controller(PanelService service, View view, TextIO io) {
         this.service = service;
         this.view = view;

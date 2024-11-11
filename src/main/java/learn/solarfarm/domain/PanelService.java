@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-@Service
+
 public class PanelService {
 
     private final PanelRepository repository;

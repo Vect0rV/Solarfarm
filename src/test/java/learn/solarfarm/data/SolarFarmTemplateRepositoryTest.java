@@ -2,10 +2,10 @@ package learn.solarfarm.data;
 
 import learn.solarfarm.models.MaterialType;
 import learn.solarfarm.models.Panel;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.Year;
@@ -13,21 +13,23 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class SolarFarmJdbcTemplateRepositoryTest {
 
+        @Autowired
         SolarFarmJdbcTemplateRepository repository;
 
-        public SolarFarmJdbcTemplateRepositoryTest() {
-            ApplicationContext context = new AnnotationConfigApplicationContext(DbTestConfig.class);
-            repository = context.getBean(SolarFarmJdbcTemplateRepository.class);
-        }
+        @Autowired
+        JdbcTemplate jdbcTemplate;
 
-        @BeforeAll
-        static void oneTimeSetup() {
-            ApplicationContext context = new AnnotationConfigApplicationContext(DbTestConfig.class);
-            JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
-            jdbcTemplate.update("call set_known_good_state();");
+        static boolean hasSetup = false;
+
+        @BeforeEach
+        void setup() {
+            if (!hasSetup) {
+                hasSetup = true;
+                jdbcTemplate.update("call set_known_good_state();");
+            }
         }
 
         @Test
