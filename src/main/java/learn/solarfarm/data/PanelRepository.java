@@ -7,6 +7,8 @@ import java.util.List;
 public interface PanelRepository {
     List<Panel> findAll() throws DataAccessException;
 
+    Panel findById(int id) throws DataAccessException;
+
     List<Panel> findBySection(String section) throws DataAccessException;
 
     Panel add(Panel panel) throws DataAccessException;

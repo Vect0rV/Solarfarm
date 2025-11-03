@@ -38,6 +38,17 @@ public class PanelFileRepository implements PanelRepository {
     }
 
     @Override
+    public Panel findById(int id) throws DataAccessException {
+        List<Panel> all = findAll();
+        for (Panel solarPanel : all) {
+            if (solarPanel.getPanelId() == id) {
+                return solarPanel;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public List<Panel> findBySection(String section) throws DataAccessException {
         ArrayList<Panel> panels = new ArrayList<>();
         for(Panel p : findAll()) {

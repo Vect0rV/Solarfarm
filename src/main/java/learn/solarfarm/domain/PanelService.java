@@ -36,6 +36,9 @@ public class PanelService {
         return repository.findAll();
     }
 
+    public Panel findById(int id) throws DataAccessException {
+        return repository.findById(id);
+    }
 
     public PanelResult add(Panel panel) throws DataAccessException {
 
@@ -56,12 +59,12 @@ public class PanelService {
         return result;
     }
 
-    public PanelResult update(Panel panel) throws DataAccessException {
+    public Result update(Panel panel) throws DataAccessException {
 //        PanelResult result = validate(panel);
-        PanelResult result = new PanelResult();
+        Result result = new Result();
 
         if(panel.getPanelId() <= 0) {
-            result.addErrorMessage("Panel ID is required");
+            result.addMessage("Panel ID is required", ResultType.INVALID);
         }
 
         if(result.isSuccess()) {
@@ -69,7 +72,7 @@ public class PanelService {
                 result.setPayload(panel);
             } else {
                 String message = String.format("Panel ID %s not found", panel.getPanelId());
-                result.addErrorMessage(message);
+                result.addMessage(message, ResultType.NOT_FOUND);
 
             }
         }
@@ -77,13 +80,13 @@ public class PanelService {
         return result;
     }
 
-    public PanelResult delete(int panelId) throws DataAccessException {
-        PanelResult result = new PanelResult();
+    public Result delete(int panelId) throws DataAccessException {
+        Result result = new Result();
 
 
         if(!repository.delete(panelId)) {
             String message = String.format("Panel ID %s not found", panelId);
-            result.addErrorMessage(message);
+            result.addMessage(message, ResultType.NOT_FOUND);
             }
         return result;
     }
