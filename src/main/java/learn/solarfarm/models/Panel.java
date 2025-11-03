@@ -1,17 +1,36 @@
 package learn.solarfarm.models;
 
+import javax.validation.constraints.*;
 import java.time.Year;
 import java.util.Objects;
 
 public class Panel {
 
     private int panelId;
+
+    @NotBlank(message = "Panel section is required")
     private String section;
+
+    @NotNull(message = "Row is required")
+    @Min(value = 1, message = "Row be between 1 and 250")
+    @Max(value = 250, message = "Row be between 1 and 250")
     private int row;
+
+    @NotNull(message = "Column is required")
+    @Min(value = 1, message = "Column be between 1 and 250")
+    @Max(value = 250, message = "Column be between 1 and 250")
     private int column;
+
+
+    @NotNull(message = "Material type is required")
     private MaterialType materialType;
+
+    @NotNull(message = "Installation year is required")
+    @PastOrPresent(message = "Instillation year must be in the past")
     private Year installationYear;
+
     private boolean isTracking;
+
 
     public Panel(int panelId, String section, int row, int column, MaterialType materialType, Year installationYear, boolean isTracking) {
         this.panelId = panelId;

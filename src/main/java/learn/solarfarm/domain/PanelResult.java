@@ -31,4 +31,5 @@ public class PanelResult {
     public void setPayload(Panel payload) {
         this.payload = payload;
 
-    }}
+    }
+}

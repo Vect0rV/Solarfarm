@@ -5,6 +5,10 @@ import learn.solarfarm.data.PanelRepository;
 import learn.solarfarm.models.Panel;
 import org.springframework.stereotype.Service;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,6 +17,7 @@ import java.time.Year;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 
 public class PanelService {
@@ -33,15 +38,19 @@ public class PanelService {
 
 
     public PanelResult add(Panel panel) throws DataAccessException {
-        PanelResult result = validate(panel);
 
-        if(panel.getPanelId() > 0) {
-            result.addErrorMessage("Panel `id` should not be set.");
-        }
+        PanelResult result = new PanelResult();
 
-        if(result.isSuccess()) {
-            panel = repository.add(panel);
-            result.setPayload(panel);
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
+        Set< ConstraintViolation<Panel>> violations = validator.validate(panel);
+
+        if (!violations.isEmpty()) {
+            for (ConstraintViolation<Panel> violation : violations) {
+                result.addErrorMessage(violation.getMessage());
+            }
+            return result;
         }
 
         return result;
@@ -79,51 +88,7 @@ public class PanelService {
         return result;
     }
 
-    private PanelResult validate(Panel panel) throws DataAccessException {
 
-        PanelResult result = new PanelResult();
-        if (panel == null) {
-            result.addErrorMessage("panel cannot be null");
-            return result;
-        }
-
-        if (panel.getSection() == null || panel.getSection().trim().length() == 0) {
-            System.out.println("section is required");
-        }
-
-        if (panel.getRow() <= 0 || panel.getRow() > 250) {
-            System.out.println("Row must be between 1 and 250.");
-            result.addErrorMessage("row is required and cannot be greater than 250");
-        }
-
-        if (panel.getColumn() <= 0 || panel.getColumn() > 250) {
-            result.addErrorMessage("column is required and cannot be greater than 250");
-            return result;
-        }
-
-        if (panel.getMaterialType() == null) {
-            result.addErrorMessage("material type is required");
-        }
-
-        if (panel.getInstallationYear() == null || Year.from(Year.now()).isBefore(panel.getInstallationYear())){
-            result.addErrorMessage("Instillation year is required and must be in the past");
-        }
-
-        List<Panel> panels = repository.findAll();
-        for (Panel p : panels) {
-            if (Objects.equals(panel.getSection(), p.getSection())
-                    && Objects.equals(panel.getRow(), p.getRow())
-                    && Objects.equals(panel.getColumn(), p.getColumn())
-                    && Objects.equals(panel.getMaterialType(), p.getMaterialType())
-                    && Objects.equals(panel.getInstallationYear(), p.getInstallationYear())
-                    && Objects.equals(panel.getIsTracking(), p.getIsTracking())) {
-                result.addErrorMessage("duplicate panel is not allowed");
-                return result;
-            }
-        }
-
-        return result;
-    }
 
 
 }
