@@ -53,18 +53,6 @@ public class PanelFileRepository implements PanelRepository {
         return panels;
     }
 
-//    @Override
-//    public List<Panel> findBySectionRowColumn(String section, int row, int column) throws DataAccessException {
-//        ArrayList<Panel> panels = new ArrayList<>();
-//        for(Panel p : findAll()) {
-//            if(p.getSection().equals(section) && p.getRow() == row && p.getColumn() == column) {
-//                panels.add(p);
-//            }
-//        }
-//
-//        return panels;
-//    }
-
     public Panel add(Panel panel) throws DataAccessException {
         List<Panel> allPanels = findAll();
         int nextId = getNextId(allPanels);
