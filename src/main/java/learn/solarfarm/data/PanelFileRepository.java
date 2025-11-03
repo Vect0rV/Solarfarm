@@ -2,9 +2,7 @@ package learn.solarfarm.data;
 
 import learn.solarfarm.models.MaterialType;
 import learn.solarfarm.models.Panel;
-import learn.solarfarm.ui.Controller;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.time.Year;
@@ -17,8 +15,6 @@ public class PanelFileRepository implements PanelRepository {
     private final String filePath;
 
     private final String delimiter = ",";
-
-    private static final String HEADER = "panelId,section,row,column,materialType,instillationYear,isTracking";
 
     public PanelFileRepository(@Value("${dataFilePath}") String filePath) {
         this.filePath = filePath;
