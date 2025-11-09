@@ -21,6 +21,11 @@ public class PanelRepositoryDouble implements PanelRepository{
         return new ArrayList<>(panels);
     }
 
+    @Override
+    public Panel findById(int id) throws DataAccessException {
+        return null;
+    }
+
     public List<Panel> findBySection(String section){
         ArrayList<Panel> results = new ArrayList<>();
         for (Panel p : panels) {

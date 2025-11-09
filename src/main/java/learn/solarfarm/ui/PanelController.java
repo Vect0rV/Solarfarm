@@ -27,7 +27,7 @@ public class PanelController {
         return service.findAll();
     }
 
-    @GetMapping("/{section}")
+    @GetMapping("/section/{section}")
     public ResponseEntity<List<Panel>> findBySection(@PathVariable String section) throws DataAccessException {
         List<Panel> panels = service.findBySection(section);
         if (panels == null) {

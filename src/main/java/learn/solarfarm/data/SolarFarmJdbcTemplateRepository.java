@@ -54,6 +54,17 @@ public class SolarFarmJdbcTemplateRepository implements PanelRepository {
     }
 
     @Override
+    public Panel findById(int id) throws DataAccessException {
+        List<Panel> all = findAll();
+        for (Panel panel : all) {
+            if (panel.getPanelId() == id) {
+                return panel;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public List<Panel> findBySection(String section) {
         final String sql = "select panel_id, section, `row`, `column`, material_type, installation_year, isTracking from panel where section = ?;";
         try {
@@ -99,7 +110,7 @@ public class SolarFarmJdbcTemplateRepository implements PanelRepository {
                 + "`row` = ?, "
                 + "`column` = ?, "
                 + "material_type = ?, "
-                + "installation_year = ? "
+                + "installation_year = ?, "
                 + "isTracking = ? "
                 + "where panel_id = ?;";
 
