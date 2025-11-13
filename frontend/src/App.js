@@ -1,71 +1,70 @@
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import Home from "./components/Home";
-import Solarpanels from "./components/Solarpanels";
-import NavBar from "./components/NavBar";
-import PanelFarm from "./components/PanelFarm";
-import Confirmation from "./components/Confirmation";
-import Error from "./components/Error";
-import About from "./components/About";
-import Contact from "./components/Contact";
-import Login from "./components/Login";
-import Register from "./components/Register";
+// React & Router
 import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+
+// Context & Utilities
 import AuthContext from "./context/AuthContext";
 import { jwtDecode } from "jwt-decode";
+
+// Components
+import NavBar from "./components/NavBar";
+import Home from "./components/Home";
+import About from "./components/About";
+import Contact from "./components/Contact";
+import Solarpanels from "./components/Solarpanels";
+import PanelFarm from "./components/PanelFarm";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import Confirmation from "./components/Confirmation";
+import Error from "./components/Error";
 
 const LOCAL_STORAGE_TOKEN_KEY = "solarFarmToken"
 
 function App() {
 
   const [user, setUser] = useState(null);
+  const [isAuthRestored, setIsAuthRestored] = useState(false);
 
-  const [restoreLoginAttemptCompleted, setRestoreLoginAttemptCompleted] = useState(false);
+  const login = (token) => {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, token);
+
+      const { sub: username, roles } = jwtDecode(token);
+
+      const user = {
+        username,
+        roles,
+        token,
+        hasRole(role) {
+          return this.roles.includes(role);
+        },
+      };
+
+      setUser(user);
+      return user
+    } catch (error) {
+     console.error("Failed to decode token: ", error);
+    }
+   };
+
+ const logout = () => {
+   setUser(null);
+   localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
+ }
 
   useEffect(() => {
     const token = localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY);
     if (token) {
       login(token);
     }
-    setRestoreLoginAttemptCompleted(true);
+    setIsAuthRestored(true);
   }, []);
 
-  const login = (token) => {
-    localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, token);
-
-    const { sub: username, roles } = jwtDecode(token);
-
-    // const roles = authorititesString.split(',');
-
-    const user = {
-      username,
-      roles,
-      token,
-      hasRole(role) {
-        return this.roles.includes(role);
-      }
-    }
-    console.log("user: ", user);
-
-    setUser(user);
-
-    return user
+  const auth = {
+     user: user ? { ...user } : null,
+     login,
+     logout
   };
-
-   const auth = { 
-    user: user ? { ...user } : null,
-     login, 
-     logout 
-    }
-
-  function logout() {
-    // setUser(prev => {
-    //   console.log("user after logout: ", prev);
-    //   return null;
-    //   });
-    setUser(null);
-    localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
-    
-  }
 
   return (
     <AuthContext.Provider value={auth}>
@@ -80,7 +79,7 @@ function App() {
             <Route path="/edit/:id" element={auth.user ? <PanelFarm /> : <Navigate to="/login" />} />
             <Route path="/add" element={auth.user ? <PanelFarm /> : <Navigate to="/login" />} />
             <Route path="/login" element={<Login auth={auth}/>} />
-            <Route path="/Register" element={<Register />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/confirmation" element={<Confirmation />} />
             <Route path="/error" element={<Error />} />
           </Routes>
