@@ -1,5 +1,5 @@
 function Contact()  {
-    return <p>Email us at bugs@bugs.com</p>
+    return <p>Email us at Solarfarm@Solarfarms.com</p>
 }
 
 export default Contact;
