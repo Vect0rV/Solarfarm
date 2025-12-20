@@ -1,21 +1,34 @@
-import { useEffect, useState } from "react";
-import { Container, Row, Col, Form } from 'react-bootstrap'
+import { useContext, useEffect, useState } from "react";
+import { Container, Row, Col, Form } from 'react-bootstrap';
 import Panel from "./Panel";
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom";
+import AuthContext from "../context/AuthContext";
 
 function Solarpanels() {
     const [panels, setPanels] = useState([]);
 
     const [reload, setReload] = useState(false);
 
+    const { id } = useParams();
+
     const navigate = useNavigate();
 
+    const auth = useContext(AuthContext);
+
+    const [errors, setErrors] = useState([]);
+
     useEffect(() => {
-        
-        fetch("http://localhost:8080/api/solarpanel")
+        console.log("User: ", auth.user)
+
+        fetch("http://localhost:8080/api/panels", {
+            headers: {
+                "Authorization": `Bearer ${auth.user.token}`,
+                "Content-Type": "application/json" 
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
-                    return Promise.reject("panels fetch failed")
+                    return Promise.reject("panels fetch failed");
                 }
                 return response.json();
             })
@@ -24,20 +37,44 @@ function Solarpanels() {
     }, [reload]);
 
     const deleteById = (panelId) => {
-        fetch(`http://localhost:8080/api/solarpanel/${panelId}`, { method: "DELETE" })
+        console.log("Delete Panel Id: ", panelId)
+        fetch(`http://localhost:8080/api/panels/${panelId}`, { 
+            method: "DELETE",
+            headers:{
+                        "Authorization": `Bearer ${auth.user.token}`,
+                        "Content-Type": "application/json" 
+                    }})
             .then(response => {
                 if (response.status === 204) {
                     setReload(prev => !prev);
-                    return fetch("http://localhost:8080/api/solarpanel");
-                }})
+                    return fetch("http://localhost:8080/api/panels", {
+                        headers:{
+                            "Authorization": `Bearer ${auth.user.token}`,
+                            "Content-Type": "application/json" 
+                        }
+                    });
+                }
+                if (response.status === 403) {
+                    console.log("403 Hit");
+                    const msg = "Admin permission required";
+                    console.log("403 error msg:", msg);
+                    navigate("/deleteFailure", {state: { msg }});
+                    throw new Error("DELETE_FAILURE_HANDLED");
+                }
+            })
             .then(res => res.json())
             .then(data => {
                 setPanels(data);
             })
             .then(data => {
-                navigate("/confirmation", { msg: "All Good"});
+                console.log("Delete Success Id:", panelId);
+                navigate("/deleteSuccess", { state: {panelId}});
             })
-            .catch(() => {
+            .catch(err => {
+                if (err.message === "DELETE_FAILURE_HANDLED") {
+                    console.log("Do nothing");
+                    return; // do nothing
+                }
                 navigate("/error", { msg: "💥" });
             });
     }
@@ -52,9 +89,9 @@ function Solarpanels() {
                             section={panel.section}
                             row={panel.row}
                             column={panel.column}
-                            yearInstalled={panel.yearInstalled}
-                            material={panel.material}
-                            tracking={panel.tracking ? "Tracking" : "Not Tracking"}
+                            installationYear={panel.installationYear}
+                            materialType={panel.materialType}
+                            isTracking={panel.isTracking ? "Tracking" : "Not Tracking"}
                             onDelete={deleteById}
                             />
                     </Col>
