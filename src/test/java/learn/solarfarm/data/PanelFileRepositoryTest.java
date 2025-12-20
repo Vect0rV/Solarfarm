@@ -85,7 +85,7 @@ class PanelFileRepositoryTest {
         panel.setRow(66);
         panel.setColumn(44);
         panel.setInstallationYear(Year.of(1900));
-        panel.setMaterialType(MaterialType.ASI);
+        panel.setMaterialType(MaterialType.A_SI);
         panel.setIsTracking(false);
 
         boolean actual = repository.update(panel);
@@ -94,7 +94,7 @@ class PanelFileRepositoryTest {
         assertEquals("Dorm", panel.getSection());
         assertEquals(66, panel.getRow());
         assertEquals(Year.of(1900), panel.getInstallationYear());
-        assertEquals(MaterialType.ASI, panel.getMaterialType());
+        assertEquals(MaterialType.A_SI, panel.getMaterialType());
         assertFalse(panel.getIsTracking());
 
     }
