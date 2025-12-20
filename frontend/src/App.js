@@ -16,6 +16,8 @@ import PanelFarm from "./components/PanelFarm";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Confirmation from "./components/Confirmation";
+import DeleteSuccess from "./components/DeleteSuccess";
+import DeleteFailure  from "./components/DeleteFailure";
 import Error from "./components/Error";
 
 const LOCAL_STORAGE_TOKEN_KEY = "solarFarmToken"
@@ -29,8 +31,17 @@ function App() {
     try {
       localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, token);
 
-      const { sub: username, roles } = jwtDecode(token);
+      const decoded = jwtDecode(token);
 
+      // Decode the token
+      const { sub: username, authorities } = jwtDecode(token);
+
+      // Split the authorities string into an array of roles
+      // const roles = authorities.map(a => a.replace("ROLE_", ""));
+
+      const roles = (typeof authorities === "string" ? authorities.split(",") : authorities);
+
+      // Create the "user" object
       const user = {
         username,
         roles,
@@ -40,8 +51,15 @@ function App() {
         },
       };
 
+      // Log user and token for debugging
+      console.log("User: ", user);
+      console.log(jwtDecode(token));
+      
+      // Update the user state
       setUser(user);
-      return user
+
+      // Return the user to the caller
+      return user;
     } catch (error) {
      console.error("Failed to decode token: ", error);
     }
@@ -66,6 +84,10 @@ function App() {
      logout
   };
 
+  if (!isAuthRestored) {
+    return null;
+  }
+
   return (
     <AuthContext.Provider value={auth}>
       <Router>
@@ -81,6 +103,8 @@ function App() {
             <Route path="/login" element={<Login auth={auth}/>} />
             <Route path="/register" element={<Register />} />
             <Route path="/confirmation" element={<Confirmation />} />
+            <Route path="/deleteSuccess" element={<DeleteSuccess />} />
+            <Route path="/deleteFailure" element={<DeleteFailure />} />
             <Route path="/error" element={<Error />} />
           </Routes>
       </Router>
