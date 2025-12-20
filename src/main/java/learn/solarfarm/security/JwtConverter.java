@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Arrays;
@@ -13,17 +14,23 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class JwtConverter {
 
-    private Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    // Signing key
+//    private Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
+    private static final String SECRET = "a-very-long-secret-key-at-least-32-bytes-long-1234";
+    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
+    // Configurable constants
     private final String ISSUER = "solar-farm";
     private final int EXPIRATION_MINUTES = 60;
     private final int EXPIRATION_MILLIS = EXPIRATION_MINUTES * 60 * 1000;
 
-    public String getTokenForUser(UserDetails user) {
+    public String getTokenFromUser(UserDetails user) {
 
         String authorities = user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
+                .map(i -> i.getAuthority())
                 .collect(Collectors.joining(","));
 
         return Jwts.builder()
@@ -52,9 +59,10 @@ public class JwtConverter {
             String authStr = (String) jws.getBody().get("authorities");
 
             List<SimpleGrantedAuthority> roles = Arrays.stream(authStr.split(","))
-                    .map(SimpleGrantedAuthority::new)
+                    .map(r -> new SimpleGrantedAuthority(r))
                     .collect(Collectors.toList());
 
+            System.out.println("authStr = [" + authStr + "]");
             return new User(username, username, roles);
         } catch (JwtException e) {
             System.out.println(e);

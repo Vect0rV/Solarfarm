@@ -1,34 +1,104 @@
 package learn.solarfarm.security;
 
+import learn.solarfarm.data.AppUserRepository;
+import learn.solarfarm.domain.Result;
+import learn.solarfarm.domain.ResultType;
+import learn.solarfarm.models.AppUser;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class AppUserService implements UserDetailsService {
 
+    private final AppUserRepository repository;
     private final PasswordEncoder passwordEncoder;
 
-    private List<UserDetails> users;
-
-    public AppUserService(PasswordEncoder passwordEncoder) {
+    public AppUserService(PasswordEncoder passwordEncoder, AppUserRepository repository) {
         this.passwordEncoder = passwordEncoder;
+        this.repository = repository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        AppUser appUser = repository.findByUsername(username);
 
-        UserDetails userDetails = users.stream()
-                .filter(user -> user.getUsername().equals(username))
-                .findFirst()
-                .orElse(null);
-
-        if (userDetails == null) {
+        if (appUser == null || !appUser.isEnabled()) {
             throw  new UsernameNotFoundException(username + " not found.");
         }
 
-        return userDetails;
+        return appUser;
+    }
+
+    public Result<AppUser> create(String username, String password) {
+        Result<AppUser> result = validate(username, password);
+        if (!result.isSuccess()) {
+            return result;
+        }
+
+        password = passwordEncoder.encode(password);
+
+        AppUser appUser = new AppUser(0, username, password, true, List.of("USER"));
+
+        try {
+            appUser = repository.create(appUser);
+            result.setPayload(appUser);
+        } catch (DuplicateKeyException e) {
+            result.addMessage("there was an issue processing the provided username; please enter an alternate username"
+                    , ResultType.INVALID);
+        }
+
+        return result;
+    }
+
+    private Result<AppUser> validate(String username, String password) {
+        Result<AppUser> result = new Result<>();
+        if (username == null || username.isBlank()) {
+            result.addMessage("username is required", ResultType.INVALID);
+            return result;
+        }
+
+        if (password == null) {
+            result.addMessage("password is required", ResultType.INVALID);
+            return result;
+        }
+
+        if (username.length() > 50) {
+            result.addMessage("username must be less than 50 character", ResultType.INVALID);
+        }
+
+        if (!isValidPassword(password)) {
+            result.addMessage("password must be at least 8 characters and contain a digit, " +
+                    "a letter, and a non-digit/non-letter",
+                    ResultType.INVALID);
+        }
+
+        return result;
+    }
+
+    private boolean isValidPassword(String password) {
+        if (password.length() < 8) {
+            return false;
+        }
+
+        int digits = 0;
+        int letters = 0;
+        int others = 0;
+        for (char c : password.toCharArray()) {
+            if (Character.isDigit(c)) {
+                digits++;
+            } else if (Character.isLetter(c)) {
+                letters++;
+            } else {
+                others++;
+            }
+        }
+
+        return digits > 0 && letters > 0 && others > 0;
     }
 }
