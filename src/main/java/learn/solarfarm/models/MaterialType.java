@@ -3,8 +3,9 @@ package learn.solarfarm.models;
 public enum MaterialType {
     MULTI_SI,
     MONO_SI,
-    ASI,
+    A_SI,
     CD_TE,
-    CIGS
+    CIGS,
+    POLY_SI
 
 }
