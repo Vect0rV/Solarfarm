@@ -3,6 +3,7 @@ package learn.solarfarm.domain;
 import learn.solarfarm.data.DataAccessException;
 import learn.solarfarm.data.PanelRepository;
 import learn.solarfarm.models.Panel;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.Year;
@@ -17,6 +18,7 @@ public class PanelWebService {
         this.repository = repository;
     }
 
+    @PreAuthorize("permitAll()")
     public List<Panel> findAll() throws DataAccessException {
         return repository.findAll();
     }
@@ -37,18 +39,35 @@ public class PanelWebService {
     }
 
     public Result<Panel> update(Panel panel) throws DataAccessException {
-        Result<Panel> result = validate(panel);
-        if (panel == null || panel.getPanelId() <= 0) {
-            result.setType(ResultType.INVALID);
+        Result<Panel> result = new Result<>();
+
+        if (!result.isSuccess()) {
             return result;
         }
 
-        boolean success = repository.update(panel);
-        if (success) {
-            result.setType(ResultType.SUCCESS);
-            result.setPayload(panel);
-        } else {
-            result.setType(ResultType.NOT_FOUND);
+        if (panel == null) {
+            result.addMessage("Panel id is required for updating panel", ResultType.INVALID);
+            return result;
+        }
+        if (panel.getPanelId() <= 0) {
+            result.addMessage("Panel id cannot be 0", ResultType.INVALID);
+            return result;
+        }
+
+        result = validate(panel);
+
+        if (result.getType() == ResultType.INVALID) {
+            return result;
+        }
+
+        if (result.getType() == ResultType.SUCCESS) {
+            boolean success = repository.update(panel);
+            if (success) {
+                result.setType(ResultType.SUCCESS);
+                result.setPayload(panel);
+            } else {
+                result.setType(ResultType.NOT_FOUND);
+            }
         }
 
         return result;
@@ -90,4 +109,7 @@ public class PanelWebService {
         return result;
     }
 
+    public Panel findById(int id) throws DataAccessException {
+        return repository.findById(id);
+    }
 }
