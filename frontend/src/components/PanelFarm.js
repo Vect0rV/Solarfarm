@@ -4,15 +4,17 @@ import { Container, Row, Col, Form } from 'react-bootstrap';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 import Panel from "./Panel";
+import Error from "./Error";
+import { handleResponse } from "../api/handleResponse";
 
 const BLANK_PANEL = {
     section: "", row: 0, column: 0,
-        yearInstalled: "", material: "", tracking: false
+        installationYear: "", materialType: "", isTracking: false
 }
 
 const INITIAL_PANEL = {
     id: 17, section: "The Ridge", row: 1, column: 1,
-        yearInstalled: 2020, material: "POLY_SI", tracking: true
+        installationYear: 2020, materialType: "POLY_SI", isTracking: true
 }
 
 function PanelFarm({ panelOne = INITIAL_PANEL, blankPanel = BLANK_PANEL }) {
@@ -31,15 +33,23 @@ function PanelFarm({ panelOne = INITIAL_PANEL, blankPanel = BLANK_PANEL }) {
 
     const [panel, setPanel] = useState(null);
 
+    const [errors, setErrors] = useState([]);
+
     const [newPanel, setNewPanel] = useState(
         {section: "", row: 0, column: 0,
-        yearInstalled: "", material: "", tracking: false}
+        installationYear: "", materialType: null, isTracking: false}
     );
 
     useEffect(
         () => {
+            console.log("Trying to fetch panel: ", id);
             if (id) {
-                fetch(`http://localhost:8080/api/solarpanel/${id}`)
+                fetch(`http://localhost:8080/api/panels/${id}`, {
+                    headers: {
+                        "Authorization": `Bearer ${auth.user.token}`,
+                        "Content-Type": "application/json" 
+                    }
+                })
                     .then(response => {
                         if (response.status !== 200) {
                             return Promise.reject("panels fetch failed")
@@ -50,7 +60,9 @@ function PanelFarm({ panelOne = INITIAL_PANEL, blankPanel = BLANK_PANEL }) {
                         setPanel(json);
                         setNewPanel(json);
                     })
-                    .catch(console.log);
+                    .catch(err => {
+                        console.error("Edit fetch failed", err);
+                    });
             }
         }, 
     
@@ -60,8 +72,8 @@ function PanelFarm({ panelOne = INITIAL_PANEL, blankPanel = BLANK_PANEL }) {
     const handleChange = (evt) => {
         const {name, type, checked, value} = evt.target;
 
-        if (evt.target.name === "tracking") {
-            newPanel.tracking = evt.target.checked;
+        if (evt.target.name === "isTracking") {
+            newPanel.isTracking = evt.target.checked;
         }
 
         setNewPanel((prev) => ({
@@ -70,7 +82,7 @@ function PanelFarm({ panelOne = INITIAL_PANEL, blankPanel = BLANK_PANEL }) {
         }));
     }
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         const updatedPanel = {...newPanel};
@@ -90,31 +102,20 @@ function PanelFarm({ panelOne = INITIAL_PANEL, blankPanel = BLANK_PANEL }) {
             console.log("Fetch Updated New Panel", newPanel);
             
 
-            fetch(`http://localhost:8080/api/solarpanel/${id}`, init)
-            .then(response => {
-                console.log("Edit status", response.status)
-                if (response.status === 404) {
-                    return Promise.reject("Response is 404");
-                } else if (response.status === 204) {
-                    console.log("Panel updated!");
-                    // const updatedPanels = panels.map(p => 
-                    // p.id === panel.id ? panel : p);
-                    setReload(prev => !prev);
-                    console.log("panel after update", panel);
-                    return null;
-                } else {
-                    let message = `Panel id ${id} update failed with status ${response.status}.`
-                    console.log(message);
-                    return Promise.reject(message);
-                }
-            })
-            // .then(json => setPanels([...panels, json]))
-            .then(data => {
-                navigate("/confirmation", { msg: "^v^"});
-            })
-            .catch(error => {
-                navigate("/error", { msg: "💥" });
-            });
+            fetch(`http://localhost:8080/api/panels/${id}`, init)
+                .then(handleResponse)
+                .then(result => {
+                    if (result.error) {
+                        setErrors(result.messages);
+                        console.log("Result: ", result);
+                        console.log("Error messages: ", result.messages);
+                        return;
+                    }
+                    setPanels([...panels, result.data])
+                    navigate("/solarpanels", { msg: "Update successful"});
+                }).catch(error => {
+                    console.error("Unhandled fetch error:", error);
+                });
         } else {
             const init = {
                 method: "POST",
@@ -126,27 +127,29 @@ function PanelFarm({ panelOne = INITIAL_PANEL, blankPanel = BLANK_PANEL }) {
                 body: JSON.stringify(newPanel)
             };
 
-            fetch("http://localhost:8080/api/solarpanel", init)
-            .then(response => {
-                if (response.status !== 201) {
-                    return Promise.reject("response is not 200 ok");
+            fetch("http://localhost:8080/api/panels", init)
+            .then(handleResponse)
+            .then(result => {
+                if (result.error) {
+                    setErrors(result.messages);
+                    return;
                 }
-                return response.json();
+                setPanels([...panels, result.data])
+                navigate("/solarpanels", { msg: "^v^"});
             })
-            .then(json => setPanels([...panels, json]))
-            .then(data => {
-                navigate("/confirmation", { msg: "^v^"});
-            })
-            .catch(error => {
-                navigate("/error", { msg: "💥" });
+            .catch(() => {
+                setErrors(["Network error"]);
             });
         }
     }
 
     return (
-        <div>     
+        <div>
+            {errors.map((error, i) => (
+                <Error key={i}  msg={error}/>
+            ))}     
             <Form>
-                <h3 className="mb-3 mx-auto" style={{ maxWidth: '300px', alignContent: "center" }}>{isEditing ? `Edit Panel ${newPanel.id}` : "Add Panel"}</h3>
+                <h3 className="mb-3 mx-auto" style={{ maxWidth: '300px', alignContent: "center" }}>{id ? `Edit Panel ${newPanel.panelId}` : "Add Panel"}</h3>
                 <Form.Group className="mb-3 mx-auto" controlId="section" style={{ maxWidth: '300px', alignContent: "center" }}>
                     <Form.Label>Section</Form.Label>
                     <input type="text" className="form-control" id="section" name="section" value={newPanel.section} onChange={handleChange}/>
@@ -158,12 +161,12 @@ function PanelFarm({ panelOne = INITIAL_PANEL, blankPanel = BLANK_PANEL }) {
                     <Form.Control type="number" id="column" name="column" value={newPanel.column} onChange={handleChange}/>
                 </Form.Group>
                 <Form.Group className="mb-3 mx-auto" style={{ maxWidth: '300px', alignContent: "center" }}>
-                    <Form.Label htmlFor="yearInstalled">Installation Year</Form.Label>
-                    <input type="text" id="yearInstalled" name="yearInstalled" value={newPanel.yearInstalled} onChange={handleChange}/>
+                    <Form.Label htmlFor="installationYear">Installation Year</Form.Label>
+                    <input type="text" id="installationYear" name="installationYear" value={newPanel.installationYear} onChange={handleChange}/>
                 </Form.Group>    
                 <Form.Group className="mb-3 mx-auto" style={{ maxWidth: '300px', alignContent: "center" }}>
-                    <Form.Label htmlFor="material">Material Type</Form.Label>
-                    <Form.Control id="material" as="select" name="material" value={newPanel.material} onChange={handleChange}>
+                    <Form.Label htmlFor="materialType">Material Type</Form.Label>
+                    <Form.Control id="materialType" as="select" name="materialType" value={newPanel.materialType} onChange={handleChange}>
                         <option value="">[Select a Material Type]</option>
                         <option value="CIGS">CIGS</option>
                         <option value="A_SI">A_SI</option>
@@ -173,10 +176,10 @@ function PanelFarm({ panelOne = INITIAL_PANEL, blankPanel = BLANK_PANEL }) {
                     </Form.Control>
                 </Form.Group>
                 <Form.Group className="mb-3 mx-auto" style={{ maxWidth: '300px', alignContent: "center" }}>
-                    <input type="checkbox" value="tracking" id="chkIsTracking" name="tracking"
-                        checked={newPanel.tracking} onChange={handleChange}/>
+                    <input type="checkbox" value="tracking" id="chkIsTracking" name="isTracking"
+                        checked={newPanel.isTracking} onChange={handleChange}/>
                     <label htmlFor="chkIsTracking">
-                        <p>{newPanel.tracking ? "Tracking" : "Not Tracking"}</p></label>
+                        <p>{newPanel.isTracking ? "Tracking" : "Not Tracking"}</p></label>
                 </Form.Group>   
                 <Form.Group className="mb-3 mx-auto text-center" style={{ maxWidth: '300px', alignContent: "center" }}>
                     <Button variant="primary" type="submit" onClick={handleSubmit}>Submit</Button>
