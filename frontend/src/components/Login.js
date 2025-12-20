@@ -11,7 +11,7 @@ import Error from "./Error";
 
 const Login = () => {
 
-    const auth = useContext(AuthContext)
+    const auth = useContext(AuthContext);
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -43,11 +43,7 @@ const Login = () => {
         } else {
             setErrors(["Unknown error."]);
         }
-    }
-
-
-
-
+    };
 
     return(
         <div>
