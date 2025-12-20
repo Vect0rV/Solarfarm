@@ -5,19 +5,11 @@ import AuthContext from "../context/AuthContext";
 
 function NavBar({}) {
 
-    // const [user, setUser] = useState(null);
-
-    const auth = useContext(AuthContext)
+    const auth = useContext(AuthContext);
 
     function handleLogout() {
         auth.logout();
     }
-
-    // useEffect(() => {
-    //     if (auth.user != null) {
-    //         setUser(auth.user);
-    //     }
-    // }, [auth.user]);
 
     return (
 
@@ -45,14 +37,15 @@ function NavBar({}) {
                     <Link className="nav-link" to="/contact">Contact</Link>
                 </li>
                 {!auth.user ? (
-                <ul>
+                <>
                     <li className="nav-item">
                         <Link className="nav-link" to="/login">Login</Link>
                     </li>
                     <li className="nav-item">
                         <Link className="nav-link" to="/register">Register</Link>
                     </li>
-                </ul>) : (<li className="nav-item">
+                </>
+                ) : (<li className="nav-item">
                     Hi {auth.user.username}
                     <Button className="nav-link" onClick={handleLogout}>Logout</Button>
                 </li>)}
@@ -66,25 +59,6 @@ function NavBar({}) {
     </nav>
     );
 
-    {/* 
-            <ul>
-             <li>
-                <Link to="/">Home</Link>
-            </li>
-            <li>
-                <Link to="/add">Add</Link>
-            </li>
-            <li>
-                <Link to="/about">About</Link>
-            </li>
-            <li>
-                <Link to="/contact">Contact</Link>
-            </li>
-             <li>
-                <Link to="/login">Login</Link>
-            </li>
-            </ul>
-        </nav> */}
 }
 
 export default NavBar;
