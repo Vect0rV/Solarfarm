@@ -1,0 +1,13 @@
+# Node stuff
+frontend/node_modules/
+
+# local data
+panels-seed.txt
+panels.txt
+panels-test.txt
+
+# Maven
+target/
+
+# Gradle
+build/
