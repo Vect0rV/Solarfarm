@@ -104,7 +104,7 @@ function PanelFarm({ panelOne = INITIAL_PANEL, blankPanel = BLANK_PANEL }) {
             console.log("Fetch Updated New Panel", newPanel);
             
 
-            fetch(`process.env.REACT_APP_API_URL}/api/panels/${id}`, init)
+            fetch(`${process.env.REACT_APP_API_URL}/api/panels/${id}`, init)
                 .then(handleResponse)
                 .then(result => {
                     if (result.error) {
@@ -129,7 +129,7 @@ function PanelFarm({ panelOne = INITIAL_PANEL, blankPanel = BLANK_PANEL }) {
                 body: JSON.stringify(newPanel)
             };
 
-            fetch("process.env.REACT_APP_API_URL}/api/panels", init)
+            fetch(`${process.env.REACT_APP_API_URL}/api/panels`, init)
             .then(handleResponse)
             .then(result => {
                 if (result.error) {

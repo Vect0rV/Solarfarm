@@ -20,7 +20,7 @@ function Solarpanels() {
     useEffect(() => {
         console.log("User: ", auth.user)
 
-        fetch("process.env.REACT_APP_API_URL}/api/panels", {
+        fetch(`${process.env.REACT_APP_API_URL}/api/panels`, {
             headers: {
                 "Authorization": `Bearer ${auth.user.token}`,
                 "Content-Type": "application/json" 
@@ -38,7 +38,7 @@ function Solarpanels() {
 
     const deleteById = (panelId) => {
         console.log("Delete Panel Id: ", panelId)
-        fetch(`process.env.REACT_APP_API_URL}/api/panels/${panelId}`, { 
+        fetch(`${process.env.REACT_APP_API_URL}/api/panels/${panelId}`, { 
             method: "DELETE",
             headers:{
                         "Authorization": `Bearer ${auth.user.token}`,
@@ -47,7 +47,7 @@ function Solarpanels() {
             .then(response => {
                 if (response.status === 204) {
                     setReload(prev => !prev);
-                    return fetch("process.env.REACT_API_URL}/api/panels", {
+                    return fetch(`${process.env.REACT_APP_API_URL}/api/panels`, {
                         headers:{
                             "Authorization": `Bearer ${auth.user.token}`,
                             "Content-Type": "application/json" 
