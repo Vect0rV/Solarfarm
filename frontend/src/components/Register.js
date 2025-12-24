@@ -16,7 +16,7 @@ export default function Register () {
         console.log("Submitted");
         event.preventDefault();
 
-        const response = await fetch("process.env.REACT_API_URL}/api/create_account", {
+        const response = await fetch("process.env.REACT_APP_API_URL}/api/create_account", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json", 
