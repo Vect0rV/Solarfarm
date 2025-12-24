@@ -44,7 +44,7 @@ function PanelFarm({ panelOne = INITIAL_PANEL, blankPanel = BLANK_PANEL }) {
         () => {
             console.log("Trying to fetch panel: ", id);
             if (id) {
-                fetch(`http://localhost:8080/api/panels/${id}`, {
+                fetch(`${process.env.REACT_API_URL}/api/panels/${id}`, {
                     headers: {
                         "Authorization": `Bearer ${auth.user.token}`,
                         "Content-Type": "application/json" 
@@ -102,7 +102,7 @@ function PanelFarm({ panelOne = INITIAL_PANEL, blankPanel = BLANK_PANEL }) {
             console.log("Fetch Updated New Panel", newPanel);
             
 
-            fetch(`http://localhost:8080/api/panels/${id}`, init)
+            fetch(`process.env.REACT_API_URL}/api/panels/${id}`, init)
                 .then(handleResponse)
                 .then(result => {
                     if (result.error) {
@@ -127,7 +127,7 @@ function PanelFarm({ panelOne = INITIAL_PANEL, blankPanel = BLANK_PANEL }) {
                 body: JSON.stringify(newPanel)
             };
 
-            fetch("http://localhost:8080/api/panels", init)
+            fetch("process.env.REACT_API_URL}/api/panels", init)
             .then(handleResponse)
             .then(result => {
                 if (result.error) {

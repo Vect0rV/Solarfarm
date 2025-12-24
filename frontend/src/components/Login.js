@@ -22,7 +22,7 @@ const Login = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        const response = await fetch("http://localhost:8080/api/authenticate", {
+        const response = await fetch("process.env.REACT_API_URL}/api/authenticate", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
