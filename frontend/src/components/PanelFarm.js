@@ -40,10 +40,12 @@ function PanelFarm({ panelOne = INITIAL_PANEL, blankPanel = BLANK_PANEL }) {
         installationYear: "", materialType: null, isTracking: false}
     );
 
+
     useEffect(
         () => {
             console.log("Trying to fetch panel: ", id);
             if (id) {
+            // URL to be set as env variables
                 fetch(`${process.env.REACT_API_URL}/api/panels/${id}`, {
                     headers: {
                         "Authorization": `Bearer ${auth.user.token}`,
