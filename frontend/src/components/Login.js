@@ -22,6 +22,8 @@ const Login = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
+        console.log("API URL: ", process.env.REACT_APP_API_URL);
+
         const response = await fetch(`${process.env.REACT_APP_API_URL}/api/authenticate`, {
             method: "POST",
             headers: {
